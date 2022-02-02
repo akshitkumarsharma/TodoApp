@@ -90,36 +90,18 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
   }
 
   void saveNewTask() async {
-    Map<String, dynamic> taskAsMap = task.toMap();
-    taskAsMap.remove("taskID");
-    int? taskId = await SqliteDB.insertTask(taskAsMap);
-    if (taskId == null) {
-      print("failed");
-    } else {
-      Navigator.pushNamedAndRemoveUntil(
-          context, routing.homeScreenID, (route) => false);
-    }
+    Provider.of<TodosData>(context, listen: false).addTask(task);
+    Navigator.pop(context);
   }
 
   void updateTask() async {
-    bool success = await SqliteDB.updateTask(task);
-    if (success) {
-      print("success");
-      Navigator.pushNamedAndRemoveUntil(
-          context, routing.homeScreenID, (route) => false);
-    } else {
-      //TODO:: show some error
-    }
+    Provider.of<TodosData>(context, listen: false).updateTask(task);
+    Navigator.pop(context);
   }
 
   void deleteTask() async {
-    bool success = await SqliteDB.deleteTask(task);
-    if (success) {
-      Navigator.pushNamedAndRemoveUntil(
-          context, routing.homeScreenID, (route) => false);
-    } else {
-      //TODO::show error
-    }
+    Provider.of<TodosData>(context, listen: false).deleteTask(task);
+    Navigator.pop(context);
   }
 
   @override
@@ -131,12 +113,10 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
           size: 35,
         ),
         onPressed: () {
-          /*if (widget.task == null)
+          if (widget.task == null)
             saveNewTask();
           else
-            updateTask();*/
-          Provider.of<TodosData>(context, listen: false).addTask(task);
-          Navigator.pop(context);
+            updateTask();
         },
       ),
       appBar: AppBar(

@@ -1,6 +1,5 @@
 import "package:flutter/material.dart";
 import "routing.dart" as routing;
-import "package:todo_app/sqlite.dart";
 import "package:todo_app/task.dart";
 import 'package:provider/provider.dart';
 import "package:todo_app/shared_data.dart";
@@ -31,7 +30,6 @@ class _MyHomePageState extends State<MyHomePage> {
           //body: function(s)
           body: () {
             {
-              print("I am invoked");
               if (sd.isDataLoaded) {
                 var data = sd.activeTaskList;
                 List<Widget> children = [];
@@ -98,10 +96,8 @@ class ActivityCard extends StatelessWidget {
                 height: 20,
                 child: Checkbox(
                   onChanged: (value) async {
-                    task.isFinished = true;
-                    await SqliteDB.updateTask(task);
-                    Navigator.pushNamedAndRemoveUntil(
-                        context, routing.homeScreenID, (route) => false);
+                    await Provider.of<TodosData>(context, listen: false)
+                        .finishTask(task);
                   },
                   value: false,
                 ),
