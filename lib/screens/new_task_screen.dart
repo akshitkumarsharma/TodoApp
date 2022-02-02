@@ -10,6 +10,7 @@ class NewTaskScreen extends StatefulWidget {
 
 class _NewTaskScreenState extends State<NewTaskScreen> {
   DateTime? date = null;
+  String taskName = "";
   TextEditingController dateController = TextEditingController();
   String repetitionFrequency = "No Repeat";
   List<String> options = [
