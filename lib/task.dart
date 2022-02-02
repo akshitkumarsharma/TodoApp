@@ -15,24 +15,38 @@ class RepeatFrequency {
 }
 
 class Task {
+  static late int counter;
   Task({
     required this.taskName,
     required this.finished,
-    required this.skipped,
-    required this.taskId,
     required this.taskListID,
+    taskId = null,
     this.parentTaskID,
     this.deadlineDate,
     this.deadlineTime,
-  });
-  String taskId;
-  String taskListID;
-  String? parentTaskID; //used for repeated task instances only
+  }) {
+    if (taskId == null) {
+      this.taskId = counter;
+      counter++;
+    } else {
+      this.taskId = taskId;
+    }
+  }
+
+  static initializeCounter(int counter) {
+    Task.counter = counter;
+  }
+
+  late int taskId;
+  int taskListID;
+  int? parentTaskID; //used for repeated task instances only
   String taskName;
   DateTime? deadlineDate;
   DateTime? deadlineTime;
   bool finished;
-  bool skipped;
+  void finishTask() {
+    finished = true;
+  }
 }
 
 class RepeatingTask {
@@ -45,8 +59,9 @@ class RepeatingTask {
     this.deadlineTime,
     required this.taskListID,
   });
-  String taskListID;
-  String repeatingTaskId;
+
+  int taskListID;
+  int repeatingTaskId;
   String repeatingTaskName;
   RepeatCycle repeatCycle;
   RepeatFrequency? repeatFrequency;
@@ -55,16 +70,59 @@ class RepeatingTask {
 }
 
 class TaskList {
-  String taskListID;
+  int taskListID;
   String taskListName;
   List<Task> nonRepeatingTasks;
   List<RepeatingTask> repeatingTasks;
-  List<Task> repeatingTaskInstances = [];
+  List<Task> activeRepeatingTaskInstances;
+
   TaskList({
     required this.nonRepeatingTasks,
     required this.repeatingTasks,
-    required this.repeatingTaskInstances,
+    required this.activeRepeatingTaskInstances,
     required this.taskListID,
     required this.taskListName,
   });
+  List<Task> getActiveTasks() {
+    //TODO::Select repeating Task Instances as well
+    List<Task> activeNonRepeatingTasks = [];
+    {
+      for (var i = 0; i < nonRepeatingTasks.length; i++) {
+        if (nonRepeatingTasks[i].finished == false) {
+          activeNonRepeatingTasks.add(nonRepeatingTasks[i]);
+        }
+      }
+      return (activeNonRepeatingTasks);
+    }
+  }
+
+  List<Task> getFinishedTasks() {
+    //repeating Instances as well as non-repeating Instances
+    return ([]);
+  }
+
+  void FinishTask(Task task) {}
+
+  void addTask({
+    required String taskName,
+    DateTime? deadlineDate,
+    DateTime? deadlineTime,
+    int? parentTaskID,
+  }) {
+    //
+    Task(
+      taskName: taskName,
+      finished: false,
+      taskListID: taskListID,
+      deadlineDate: deadlineDate,
+      deadlineTime: deadlineTime,
+      parentTaskID: parentTaskID,
+    );
+
+    if (parentTaskID != null) {
+      //
+    }
+  }
+
+  void finishTask(Task task) {}
 }
