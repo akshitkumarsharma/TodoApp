@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class NewTaskScreen extends StatefulWidget {
   const NewTaskScreen({Key? key}) : super(key: key);
@@ -8,6 +9,28 @@ class NewTaskScreen extends StatefulWidget {
 }
 
 class _NewTaskScreenState extends State<NewTaskScreen> {
+  DateTime? date = null;
+  TextEditingController dateController = TextEditingController();
+  String repetitionFrequency = "No Repeat";
+  List<String> options = [
+    "No Repeat",
+    "Once a Day",
+    "Once a Day(Mon-Fri)",
+    "Once a week"
+  ];
+  List<DropdownMenuItem<String>> dropdownItemCreater(List<String> itemValues) {
+    List<DropdownMenuItem<String>> dropdownMenuItems = [];
+    for (int i = 0; i < itemValues.length; i++) {
+      dropdownMenuItems.add(
+        DropdownMenuItem<String>(
+          value: itemValues[i],
+          child: Text(itemValues[i]),
+        ),
+      );
+    }
+    return dropdownMenuItems;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,7 +40,9 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            //task details
             Text(
               "What is to be done?",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
@@ -39,8 +64,9 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
               ],
             ),
             SizedBox(
-              height: 8,
+              height: 40,
             ),
+            //date details
             Text(
               "Due Date",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
@@ -49,6 +75,8 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
               children: [
                 Flexible(
                   child: TextField(
+                    controller: dateController,
+                    readOnly: true,
                     decoration: InputDecoration(
                       isDense: true,
                     ),
@@ -57,14 +85,100 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                 CustomIconButton(
                   iconData: Icons.calendar_today_outlined,
                   onPressed: () async {
-                    var date = await showDatePicker(
+                    var pickedDate = await showDatePicker(
                         context: context,
-                        initialDate: DateTime.now(),
+                        initialDate: date == null ? DateTime.now() : date!,
                         firstDate: DateTime.now(),
                         lastDate: DateTime(2101));
+
+                    if (pickedDate != null) {
+                      date = pickedDate;
+                      setState(() {});
+                      var dateString =
+                          DateFormat('EEEE, d MMM, yyyy').format(pickedDate);
+                      dateController.text = dateString;
+                    }
+
+                    print(pickedDate);
                   },
                 ),
+                Visibility(
+                  visible: date == null ? false : true,
+                  child: CustomIconButton(
+                    iconData: Icons.cancel,
+                    onPressed: () {
+                      date = null;
+                      setState(() {});
+                      dateController.text = "";
+                    },
+                  ),
+                ),
               ],
+            ),
+            //time details
+            Row(
+              children: [
+                Flexible(
+                  child: TextField(
+                    controller: dateController,
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      isDense: true,
+                    ),
+                  ),
+                ),
+                CustomIconButton(
+                  iconData: Icons.calendar_today_outlined,
+                  onPressed: () async {
+                    var pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: date == null ? DateTime.now() : date!,
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime(2101));
+
+                    if (pickedDate != null) {
+                      date = pickedDate;
+                      setState(() {});
+                      var dateString =
+                          DateFormat('EEEE, d MMM, yyyy').format(pickedDate);
+                      dateController.text = dateString;
+                    }
+
+                    print(pickedDate);
+                  },
+                ),
+                Visibility(
+                  visible: date == null ? false : true,
+                  child: CustomIconButton(
+                    iconData: Icons.cancel,
+                    onPressed: () {
+                      date = null;
+                      setState(() {});
+                      dateController.text = "";
+                    },
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 60,
+            ),
+            Text(
+              "Repeat",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+            ),
+            DropdownButton<String>(
+              items: dropdownItemCreater(options),
+              value: repetitionFrequency,
+              onChanged: (String? chosenValue) {
+                if (chosenValue != null) {
+                  if (chosenValue != options.last) {
+                    repetitionFrequency =
+                        chosenValue == null ? repetitionFrequency : chosenValue;
+                    setState(() {});
+                  } else {}
+                }
+              },
             ),
           ],
         ),
