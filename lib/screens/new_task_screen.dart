@@ -13,10 +13,11 @@ class NewTaskScreen extends StatefulWidget {
 
 class _NewTaskScreenState extends State<NewTaskScreen> {
   Task task = Task(
+      isFinished: false,
+      isRepeating: false,
       taskName: "",
-      finished: false,
       taskListID: 0,
-      taskId: -1,
+      taskID: -1,
       parentTaskID: null,
       deadlineDate: null,
       deadlineTime: null);
@@ -68,24 +69,13 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
   }
 
   void saveNewTask() async {
-    Map<String, dynamic> taskAsMap = {
-      "taskListID": task.taskListID,
-      "parentTaskID": null,
-      "taskName": task.taskName,
-      "deadlineDate": task.deadlineDate == null
-          ? null
-          : task.deadlineDate!.millisecondsSinceEpoch,
-      "deadlineTime": task.deadlineTime == null
-          ? null
-          : intFromTimeOfDay(task.deadlineTime!),
-      "isFinished": 0,
-      "isRepeating": 0,
-    };
+    Map<String, dynamic> taskAsMap = task.toMap();
+    taskAsMap.remove("taskID");
     int? taskId = await SqliteDB.insertTask(taskAsMap);
     if (taskId == null) {
       print("failed");
     } else {
-      print("success");
+      Navigator.pop(context);
       Navigator.pushNamedAndRemoveUntil(
           context, routing.homeScreenID, (route) => false);
     }

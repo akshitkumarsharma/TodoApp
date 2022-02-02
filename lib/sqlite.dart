@@ -17,12 +17,13 @@ class SqliteDB {
   static initDb() async {
     String folderPath = await getDatabasesPath();
     String path = join(folderPath, "todo.db");
+    //await deleteDatabase(path);
     var taskDb = await openDatabase(
       path,
       version: 3,
       onCreate: (Database db, int t) async {
         await db.execute(
-            'CREATE TABLE TASK (taskId INTEGER PRIMARY KEY, taskListID INTEGER, parentTaskID INTEGER, taskName TEXT, deadlineDate INTEGER, deadlineTime INTEGER, isFinished INTEGER, isRepeating INTEGER)');
+            'CREATE TABLE TASK (taskID INTEGER PRIMARY KEY, taskListID INTEGER, parentTaskID INTEGER, taskName TEXT, deadlineDate INTEGER, deadlineTime INTEGER, isFinished INTEGER, isRepeating INTEGER)');
       },
     );
     _db = taskDb;
@@ -40,13 +41,17 @@ class SqliteDB {
     }
   }
 
-  static Future<List<Task>?> getAllTasks() async {
+  static Future<List<Task>> getAllTasks() async {
     var dbClient = await db;
+    //await Future.delayed(Duration(seconds: 1));
     List<Map<String, dynamic>> taskListFromDB = await dbClient.query("TASK");
+    List<Task> taskListAsObjects = [];
     for (var map in taskListFromDB) {
       print(map);
+      taskListAsObjects.add(Task.fromMap(map));
     }
     /*var taskListInMemory = taskListFromDB.map((t) => Task.fromMap(t)).toList();
     return (taskListInMemory);*/
+    return (taskListAsObjects);
   }
 }

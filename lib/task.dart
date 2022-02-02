@@ -35,23 +35,60 @@ class RepeatFrequency {
 class Task {
   Task({
     required this.taskName,
-    required this.finished,
     required this.taskListID,
-    required this.taskId,
+    required this.taskID,
+    required this.isFinished,
+    required this.isRepeating,
     this.parentTaskID,
     this.deadlineDate,
     this.deadlineTime,
   });
 
-  late int taskId;
+  int taskID;
   int taskListID;
   int? parentTaskID; //used for repeated task instances only
   String taskName;
   DateTime? deadlineDate;
   TimeOfDay? deadlineTime;
-  bool finished;
+  bool isFinished;
+  bool isRepeating;
+
   void finishTask() {
-    finished = true;
+    isFinished = true;
+  }
+
+  Map<String, dynamic> toMap() {
+    Map<String, dynamic> taskAsMap = {
+      "taskID": taskID,
+      "taskListID": taskListID,
+      "parentTaskID": null,
+      "taskName": taskName,
+      "deadlineDate":
+          deadlineDate == null ? null : deadlineDate!.millisecondsSinceEpoch,
+      "deadlineTime":
+          deadlineTime == null ? null : intFromTimeOfDay(deadlineTime!),
+      "isFinished": 0,
+      "isRepeating": 0,
+    };
+    return (taskAsMap);
+  }
+
+  static Task fromMap(Map<String, dynamic> taskAsMap) {
+    Task task = Task(
+      taskID: taskAsMap["taskID"],
+      taskListID: taskAsMap["taskListID"],
+      parentTaskID: taskAsMap["parentTaskID"],
+      taskName: taskAsMap["taskName"],
+      deadlineDate: taskAsMap["deadlineDate"] == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(taskAsMap["deadlineDate"]),
+      deadlineTime: taskAsMap["deadlineTime"] == null
+          ? null
+          : timeOfDayFromInt(taskAsMap["deadlineTime"]),
+      isFinished: taskAsMap["isFinished"] == 0 ? false : true,
+      isRepeating: taskAsMap["isRepeating"] == 0 ? false : true,
+    );
+    return (task);
   }
 }
 
@@ -97,7 +134,7 @@ class TaskList {
     required this.taskListID,
     required this.taskListName,
   });
-  List<Task> getActiveTasks() {
+  /*List<Task> getActiveTasks() {
     //TODO::Select repeating Task Instances as well
     List<Task> activeNonRepeatingTasks = [];
     {
@@ -108,14 +145,14 @@ class TaskList {
       }
       return (activeNonRepeatingTasks);
     }
-  }
+  }*/
 
-  List<Task> getFinishedTasks() {
+  /*List<Task> getFinishedTasks() {
     //repeating Instances as well as non-repeating Instances
     return ([]);
   }
 
-  void FinishTask(Task task) {}
+  void FinishTask(Task task) {}*/
 
   /*void addTask({
     required String taskName,
@@ -138,5 +175,5 @@ class TaskList {
     }
   }*/
 
-  void finishTask(Task task) {}
+  /*void finishTask(Task task) {}*/
 }
