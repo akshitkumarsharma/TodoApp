@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+//used to display in UI
+const String noRepeat = "No Repeat";
+
 enum RepeatCycle {
   onceADay,
   onceADayMonFri,
@@ -50,6 +53,14 @@ class Task {
   void finishTask() {
     finished = true;
   }
+}
+
+int intFromTimeOfDay(TimeOfDay tod) {
+  return (tod.minute + 60 * tod.hour);
+}
+
+TimeOfDay timeOfDayFromInt(int todInt) {
+  return TimeOfDay(hour: todInt ~/ 60, minute: todInt % 60);
 }
 
 class RepeatingTask {

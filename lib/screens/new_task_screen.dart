@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import "package:flutter/material.dart";
 import 'package:intl/intl.dart';
 import 'package:todo_app/task.dart';
+import 'package:todo_app/sqlite.dart';
+import 'routing.dart' as routing;
 
 class NewTaskScreen extends StatefulWidget {
   const NewTaskScreen({Key? key}) : super(key: key);
@@ -20,7 +22,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
       deadlineTime: null);
   TextEditingController dateController = TextEditingController();
   TextEditingController timeController = TextEditingController();
-  RepeatCycle? chosenRepeatCycle = null;
+  RepeatCycle? chosenRepeatCycle;
   RepeatFrequency repeatFrequency =
       RepeatFrequency(num: 2, tenure: Tenure.days);
 
@@ -65,9 +67,42 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
     return dropdownMenuItems;
   }
 
+  void saveNewTask() async {
+    Map<String, dynamic> taskAsMap = {
+      "taskListID": task.taskListID,
+      "parentTaskID": null,
+      "taskName": task.taskName,
+      "deadlineDate": task.deadlineDate == null
+          ? null
+          : task.deadlineDate!.millisecondsSinceEpoch,
+      "deadlineTime": task.deadlineTime == null
+          ? null
+          : intFromTimeOfDay(task.deadlineTime!),
+      "isFinished": 0,
+      "isRepeating": 0,
+    };
+    int? taskId = await SqliteDB.insertTask(taskAsMap);
+    if (taskId == null) {
+      print("failed");
+    } else {
+      print("success");
+      Navigator.pushNamedAndRemoveUntil(
+          context, routing.homeScreenID, (route) => false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: Icon(
+          Icons.check,
+          size: 35,
+        ),
+        onPressed: () {
+          saveNewTask();
+        },
+      ),
       appBar: AppBar(
         title: Text("New Task"),
       ),
@@ -194,9 +229,9 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                     List<DropdownMenuItem<dynamic>> items = [];
                     items.add(const DropdownMenuItem<dynamic>(
                       child: Text(
-                        "No Repeat",
+                        "noRepeat",
                       ),
-                      value: "No Repeat",
+                      value: "noRepeat",
                     ));
                     for (var value in RepeatCycle.values) {
                       items.add(DropdownMenuItem<dynamic>(
@@ -207,13 +242,13 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                       ));
                     }
 
-                    //values.add("No Repeat");
+                    //values.add("noRepeat");
                     return (items);
                   }(),
-                  value: chosenRepeatCycle ?? "No Repeat",
+                  value: chosenRepeatCycle ?? "noRepeat",
                   onChanged: (dynamic chosenValue) {
                     if (chosenValue != null) {
-                      if (chosenValue == "No Repeat")
+                      if (chosenValue == "noRepeat")
                         chosenRepeatCycle = null;
                       else
                         chosenRepeatCycle = chosenValue;

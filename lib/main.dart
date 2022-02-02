@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:todo_app/screens/routing.dart';
+import 'package:todo_app/screens/routing.dart' as routing;
 import 'screens/new_task_screen.dart';
+import 'sqlite.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SqliteDB.initDb();
   runApp(const MyApp());
 }
 
@@ -26,11 +29,12 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.red,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      initialRoute: routing.homeScreenID,
       routes: {
-        newTaskScreenID: (context) {
-          return const NewTaskScreen();
-        }
+        routing.newTaskScreenID: (context) => const NewTaskScreen(),
+        routing.homeScreenID: (context) => const MyHomePage(
+              title: '',
+            ),
       },
     );
   }
@@ -66,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, newTaskScreenID);
+          Navigator.pushNamed(context, routing.newTaskScreenID);
         },
         child: const Icon(
           Icons.add,

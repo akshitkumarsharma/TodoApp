@@ -1,1 +1,2 @@
-const String newTaskScreenID = "newTaskScreen";
+const String newTaskScreenID = "NewTaskScreen";
+const String homeScreenID = "HomeScreen";
