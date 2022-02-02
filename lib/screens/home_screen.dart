@@ -13,12 +13,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Future<List<Task>> taskList = SqliteDB.getAllPendingTasks();
-  //FutureBuilder
-
   @override
   Widget build(BuildContext context) {
-    return Consumer<SharedData>(
+    return Consumer<TodosData>(
       builder: (context, sd, x) {
         return Scaffold(
           floatingActionButton: FloatingActionButton(
@@ -29,13 +26,14 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           appBar: AppBar(
-            title: Text(sd.x.toString()),
+            title: Text("Todos"),
           ),
-          body: FutureBuilder<List<Task>>(
-            future: taskList,
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
-              if (snapshot.hasData) {
-                var data = snapshot.data;
+          //body: function(s)
+          body: () {
+            {
+              print("I am invoked");
+              if (sd.isDataLoaded) {
+                var data = sd.activeTaskList;
                 List<Widget> children = [];
                 for (var task in data) {
                   children.add(ActivityCard(
@@ -55,30 +53,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   padding: const EdgeInsets.all(5),
                   children: children,
                 );
-              } else if (snapshot.hasError) {
-                return Container(child: Text("Some error"));
               } else {
                 //if future has not returned
                 return Center(child: CircularProgressIndicator());
               }
-            },
-          ),
-          /*ListView(
-          padding: const EdgeInsets.all(5),
-          children: const [
-            /*ActivityCard(header: "Pay fees", date: "3rd Jan", list: "Pay bills"),
-            ActivityCard(header: "Pay bill", date: "4th Jan", list: "Pay bills"),
-            ActivityCard(
-                header: "Do recharge", date: "4th Jan", list: "Pay bills"),
-            ActivityCard(header: "Wake up", date: "4th Jan", list: "Daily"),
-            ActivityCard(header: "Wake up", date: "4th Jan", list: "Daily"),
-            ActivityCard(header: "Wake up", date: "4th Jan", list: "Daily"),
-            ActivityCard(header: "Wake up", date: "4th Jan", list: "Daily"),
-            ActivityCard(header: "Wake up", date: "4th Jan", list: "Daily"),
-            ActivityCard(header: "Wake up", date: "4th Jan", list: "Daily"),
-            ActivityCard(header: "Wake up", date: "4th Jan", list: "Daily"),*/
-          ],
-        ),*/
+            }
+          }(),
         );
       },
     );

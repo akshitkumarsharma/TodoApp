@@ -19,7 +19,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
       isFinished: false,
       isRepeating: false,
       taskName: "",
-      taskListID: 0,
+      taskListID: 1,
       taskID: -1,
       parentTaskID: null,
       deadlineDate: null,
@@ -135,7 +135,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
             saveNewTask();
           else
             updateTask();*/
-          Provider.of<SharedData>(context, listen: false).incrementX();
+          Provider.of<TodosData>(context, listen: false).addTask(task);
           Navigator.pop(context);
         },
       ),
