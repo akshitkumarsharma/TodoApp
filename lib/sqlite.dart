@@ -22,8 +22,12 @@ class SqliteDB {
       path,
       version: 3,
       onCreate: (Database db, int t) async {
+        /*await db.execute(
+            'CREATE TABLE LIST (listID INTEGER PRIMARY KEY, listName TEXT, isActive INTEGER)');*/
         await db.execute(
-            'CREATE TABLE TASK (taskID INTEGER PRIMARY KEY, taskListID INTEGER, parentTaskID INTEGER, taskName TEXT, deadlineDate INTEGER, deadlineTime INTEGER, isFinished INTEGER, isRepeating INTEGER)');
+            'CREATE TABLE TASK (taskID INTEGER PRIMARY KEY, taskListID INTEGER, parentTaskID INTEGER, taskName TEXT, deadlineDate INTEGER, deadlineTime INTEGER, isFinished INTEGER, isRepeating INTEGER, )');
+
+        //await db.insert("LIST", {"listName": "Default", "isActive": 1});
       },
     );
     _db = taskDb;
@@ -41,10 +45,11 @@ class SqliteDB {
     }
   }
 
-  static Future<List<Task>> getAllTasks() async {
+  ///returns all taks whose isFinished is false
+  static Future<List<Task>> getAllPendingTasks() async {
     var dbClient = await db;
-    //await Future.delayed(Duration(seconds: 1));
-    List<Map<String, dynamic>> taskListFromDB = await dbClient.query("TASK");
+    List<Map<String, dynamic>> taskListFromDB =
+        await dbClient.query("TASK", where: "isFinished = ?", whereArgs: [0]);
     List<Task> taskListAsObjects = [];
     for (var map in taskListFromDB) {
       print(map);
@@ -53,5 +58,19 @@ class SqliteDB {
     /*var taskListInMemory = taskListFromDB.map((t) => Task.fromMap(t)).toList();
     return (taskListInMemory);*/
     return (taskListAsObjects);
+  }
+
+  static Future<bool> updateTask(Task task) async {
+    var dbClient = await db;
+    int changes = await dbClient.update("TASK", task.toMap(),
+        where: "taskID = ?", whereArgs: [task.taskID]);
+    return (changes > 0);
+  }
+
+  static Future<bool> deleteTask(Task task) async {
+    var dbClient = await db;
+    int changes = await dbClient
+        .delete("TASK", where: "taskID = ?", whereArgs: [task.taskID]);
+    return (changes == 1);
   }
 }

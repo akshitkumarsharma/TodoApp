@@ -67,8 +67,8 @@ class Task {
           deadlineDate == null ? null : deadlineDate!.millisecondsSinceEpoch,
       "deadlineTime":
           deadlineTime == null ? null : intFromTimeOfDay(deadlineTime!),
-      "isFinished": 0,
-      "isRepeating": 0,
+      "isFinished": isFinished == true ? 1 : 0,
+      "isRepeating": isRepeating == true ? 1 : 0,
     };
     return (taskAsMap);
   }

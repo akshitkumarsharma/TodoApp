@@ -32,6 +32,7 @@ class MyApp extends StatelessWidget {
         var args = settings.arguments;
         if (pageName == routing.newTaskScreenID) {
           if (args is Task) {
+            print(args);
             return MaterialPageRoute(
                 builder: (context) => NewTaskScreen(task: args));
           }

@@ -24,9 +24,27 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
       deadlineTime: null);
   TextEditingController dateController = TextEditingController();
   TextEditingController timeController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
   RepeatCycle? chosenRepeatCycle;
   RepeatFrequency repeatFrequency =
       RepeatFrequency(num: 2, tenure: Tenure.days);
+
+  /*@override
+  initState() {
+    super.initState();
+  }*/
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    task = widget.task ?? task;
+    dateController.text = task.deadlineDate == null
+        ? ""
+        : DateFormat('EEEE, d MMM, yyyy').format(task.deadlineDate!);
+    timeController.text =
+        task.deadlineTime == null ? "" : task.deadlineTime!.format(context);
+    nameController.text = task.taskName;
+  }
 
   void datePicker() async {
     DateTime? pickedDate = await showDatePicker(
@@ -76,15 +94,34 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
     if (taskId == null) {
       print("failed");
     } else {
-      Navigator.pop(context);
       Navigator.pushNamedAndRemoveUntil(
           context, routing.homeScreenID, (route) => false);
     }
   }
 
+  void updateTask() async {
+    bool success = await SqliteDB.updateTask(task);
+    if (success) {
+      print("success");
+      Navigator.pushNamedAndRemoveUntil(
+          context, routing.homeScreenID, (route) => false);
+    } else {
+      //TODO:: show some error
+    }
+  }
+
+  void deleteTask() async {
+    bool success = await SqliteDB.deleteTask(task);
+    if (success) {
+      Navigator.pushNamedAndRemoveUntil(
+          context, routing.homeScreenID, (route) => false);
+    } else {
+      //TODO::show error
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    print(widget.task);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         child: Icon(
@@ -92,11 +129,22 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
           size: 35,
         ),
         onPressed: () {
-          saveNewTask();
+          if (widget.task == null)
+            saveNewTask();
+          else
+            updateTask();
         },
       ),
       appBar: AppBar(
-        title: Text("New Task"),
+        title: Text(widget.task == null ? "New Task" : "Edit Task"),
+        actions: widget.task != null
+            ? [
+                IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: deleteTask,
+                )
+              ]
+            : [],
       ),
       body: Container(
         padding: EdgeInsets.all(10),
@@ -122,6 +170,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                       isDense: true,
                       hintText: "Enter Task Here",
                     ),
+                    controller: nameController,
                     onChanged: (String? value) {
                       task.taskName = value == null ? task.taskName : value;
                     },

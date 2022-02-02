@@ -11,25 +11,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Future<List<Task>> taskList = SqliteDB.getAllTasks();
+  Future<List<Task>> taskList = SqliteDB.getAllPendingTasks();
   //FutureBuilder
-
-  /*Widget futureBuilderProvider() {
-    return (FutureBuilder<List<Task>>(
-      future: taskList,
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (snapshot.hasData) {
-          Text("I Have Data");
-        } else if (snapshot.hasError) {
-          Text("Some error");
-        } else {
-          //if future has not returned
-          Text("Waiting");
-        }
-        return Container();
-      },
-    ));
-  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
             List<Widget> children = [];
             for (var task in data) {
               children.add(ActivityCard(
+                task: task,
                 header: task.taskName,
                 date: task.deadlineDate == null
                     ? ""
@@ -101,11 +85,13 @@ class ActivityCard extends StatelessWidget {
     required this.date,
     required this.list,
     required this.onTap,
+    required this.task,
     Key? key,
   }) : super(key: key);
 
   final String header, date, list;
   final void Function() onTap;
+  final Task task;
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +111,12 @@ class ActivityCard extends StatelessWidget {
                 width: 20,
                 height: 20,
                 child: Checkbox(
-                  onChanged: (value) {},
+                  onChanged: (value) async {
+                    task.isFinished = true;
+                    await SqliteDB.updateTask(task);
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, routing.homeScreenID, (route) => false);
+                  },
                   value: false,
                 ),
               ),
