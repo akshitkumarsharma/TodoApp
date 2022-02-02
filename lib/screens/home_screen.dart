@@ -52,11 +52,16 @@ class _MyHomePageState extends State<MyHomePage> {
             List<Widget> children = [];
             for (var task in data) {
               children.add(ActivityCard(
-                  header: task.taskName,
-                  date: task.deadlineDate == null
-                      ? ""
-                      : task.deadlineDate.toString(),
-                  list: task.taskListID.toString()));
+                header: task.taskName,
+                date: task.deadlineDate == null
+                    ? ""
+                    : task.deadlineDate.toString(),
+                list: task.taskListID.toString(),
+                onTap: () {
+                  Navigator.pushNamed(context, routing.newTaskScreenID,
+                      arguments: task);
+                },
+              ));
             }
             return ListView(
               padding: const EdgeInsets.all(5),
@@ -95,55 +100,60 @@ class ActivityCard extends StatelessWidget {
     required this.header,
     required this.date,
     required this.list,
+    required this.onTap,
     Key? key,
   }) : super(key: key);
 
   final String header, date, list;
+  final void Function() onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: Container(
-        padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-        width: double.infinity,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 20,
-              height: 20,
-              child: Checkbox(
-                onChanged: (value) {},
-                value: false,
-              ),
-            ),
-            Container(
-              width: 10,
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  header,
-                  style: TextStyle(
-                    //color, fontsize, fontweight
-                    color: Colors.orange,
-                    //fontWeight: FontWeight.w900,
-                    fontSize: 18,
-                  ),
-                ),
-                SizedBox(height: 5),
-                Text(date),
-                Text(list),
-              ],
-            ),
-          ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
         ),
+        child: Container(
+          padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+          width: double.infinity,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: Checkbox(
+                  onChanged: (value) {},
+                  value: false,
+                ),
+              ),
+              Container(
+                width: 10,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    header,
+                    style: TextStyle(
+                      //color, fontsize, fontweight
+                      color: Colors.orange,
+                      //fontWeight: FontWeight.w900,
+                      fontSize: 18,
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Text(date),
+                  Text(list),
+                ],
+              ),
+            ],
+          ),
+        ),
+        color: Colors.yellow,
       ),
-      color: Colors.yellow,
     );
   }
 }

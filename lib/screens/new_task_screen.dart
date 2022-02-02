@@ -6,7 +6,8 @@ import 'package:todo_app/sqlite.dart';
 import 'routing.dart' as routing;
 
 class NewTaskScreen extends StatefulWidget {
-  const NewTaskScreen({Key? key}) : super(key: key);
+  NewTaskScreen({Key? key, this.task}) : super(key: key);
+  final Task? task;
   @override
   _NewTaskScreenState createState() => _NewTaskScreenState();
 }
@@ -83,6 +84,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.task);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         child: Icon(
