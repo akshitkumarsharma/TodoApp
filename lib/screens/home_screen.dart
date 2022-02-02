@@ -2,6 +2,8 @@ import "package:flutter/material.dart";
 import "routing.dart" as routing;
 import "package:todo_app/sqlite.dart";
 import "package:todo_app/task.dart";
+import 'package:provider/provider.dart';
+import "package:todo_app/shared_data.dart";
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -16,65 +18,69 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        //onPressed: (){},
-        child: const Icon(Icons.add, size: 35),
-        onPressed: () {
-          Navigator.pushNamed(context, routing.newTaskScreenID);
-        },
-      ),
-      appBar: AppBar(
-        title: Text("Todo"),
-      ),
-      body: FutureBuilder<List<Task>>(
-        future: taskList,
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.hasData) {
-            var data = snapshot.data;
-            List<Widget> children = [];
-            for (var task in data) {
-              children.add(ActivityCard(
-                task: task,
-                header: task.taskName,
-                date: task.deadlineDate == null
-                    ? ""
-                    : task.deadlineDate.toString(),
-                list: task.taskListID.toString(),
-                onTap: () {
-                  Navigator.pushNamed(context, routing.newTaskScreenID,
-                      arguments: task);
-                },
-              ));
-            }
-            return ListView(
-              padding: const EdgeInsets.all(5),
-              children: children,
-            );
-          } else if (snapshot.hasError) {
-            return Container(child: Text("Some error"));
-          } else {
-            //if future has not returned
-            return Center(child: CircularProgressIndicator());
-          }
-        },
-      ),
-      /*ListView(
-        padding: const EdgeInsets.all(5),
-        children: const [
-          /*ActivityCard(header: "Pay fees", date: "3rd Jan", list: "Pay bills"),
-          ActivityCard(header: "Pay bill", date: "4th Jan", list: "Pay bills"),
-          ActivityCard(
-              header: "Do recharge", date: "4th Jan", list: "Pay bills"),
-          ActivityCard(header: "Wake up", date: "4th Jan", list: "Daily"),
-          ActivityCard(header: "Wake up", date: "4th Jan", list: "Daily"),
-          ActivityCard(header: "Wake up", date: "4th Jan", list: "Daily"),
-          ActivityCard(header: "Wake up", date: "4th Jan", list: "Daily"),
-          ActivityCard(header: "Wake up", date: "4th Jan", list: "Daily"),
-          ActivityCard(header: "Wake up", date: "4th Jan", list: "Daily"),
-          ActivityCard(header: "Wake up", date: "4th Jan", list: "Daily"),*/
-        ],
-      ),*/
+    return Consumer<SharedData>(
+      builder: (context, sd, x) {
+        return Scaffold(
+          floatingActionButton: FloatingActionButton(
+            //onPressed: (){},
+            child: const Icon(Icons.add, size: 35),
+            onPressed: () {
+              Navigator.pushNamed(context, routing.newTaskScreenID);
+            },
+          ),
+          appBar: AppBar(
+            title: Text(sd.x.toString()),
+          ),
+          body: FutureBuilder<List<Task>>(
+            future: taskList,
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.hasData) {
+                var data = snapshot.data;
+                List<Widget> children = [];
+                for (var task in data) {
+                  children.add(ActivityCard(
+                    task: task,
+                    header: task.taskName,
+                    date: task.deadlineDate == null
+                        ? ""
+                        : task.deadlineDate.toString(),
+                    list: task.taskListID.toString(),
+                    onTap: () {
+                      Navigator.pushNamed(context, routing.newTaskScreenID,
+                          arguments: task);
+                    },
+                  ));
+                }
+                return ListView(
+                  padding: const EdgeInsets.all(5),
+                  children: children,
+                );
+              } else if (snapshot.hasError) {
+                return Container(child: Text("Some error"));
+              } else {
+                //if future has not returned
+                return Center(child: CircularProgressIndicator());
+              }
+            },
+          ),
+          /*ListView(
+          padding: const EdgeInsets.all(5),
+          children: const [
+            /*ActivityCard(header: "Pay fees", date: "3rd Jan", list: "Pay bills"),
+            ActivityCard(header: "Pay bill", date: "4th Jan", list: "Pay bills"),
+            ActivityCard(
+                header: "Do recharge", date: "4th Jan", list: "Pay bills"),
+            ActivityCard(header: "Wake up", date: "4th Jan", list: "Daily"),
+            ActivityCard(header: "Wake up", date: "4th Jan", list: "Daily"),
+            ActivityCard(header: "Wake up", date: "4th Jan", list: "Daily"),
+            ActivityCard(header: "Wake up", date: "4th Jan", list: "Daily"),
+            ActivityCard(header: "Wake up", date: "4th Jan", list: "Daily"),
+            ActivityCard(header: "Wake up", date: "4th Jan", list: "Daily"),
+            ActivityCard(header: "Wake up", date: "4th Jan", list: "Daily"),*/
+          ],
+        ),*/
+        );
+      },
     );
   }
 }

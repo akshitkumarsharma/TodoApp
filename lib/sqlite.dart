@@ -13,6 +13,30 @@ class SqliteDB {
     return _db!;
   }
 
+  static Future _onConfigure(Database db) async {
+    await db.execute('PRAGMA foreign_keys = ON');
+  }
+
+  static Future _onCreate(Database db, int t) async {
+    await db.execute('CREATE TABLE LIST (listID INTEGER PRIMARY KEY, '
+        'listName TEXT, '
+        'isActive INTEGER)');
+    await db.execute('CREATE TABLE TASK (taskID INTEGER PRIMARY KEY, '
+        'taskListID INTEGER, '
+        'parentTaskID INTEGER, '
+        'taskName TEXT, '
+        'deadlineDate INTEGER, '
+        'deadlineTime INTEGER, '
+        'isFinished INTEGER, '
+        'isRepeating INTEGER, '
+        'FOREIGN KEY (taskListId) REFERENCES LIST (listID) ON DELETE NO ACTION ON UPDATE NO ACTION)');
+    await db.insert("LIST", {
+      "listId": 1,
+      "listName": "Default",
+      "isActive": 1,
+    });
+  }
+
   /// Initialize DB
   static initDb() async {
     String folderPath = await getDatabasesPath();
@@ -21,14 +45,8 @@ class SqliteDB {
     var taskDb = await openDatabase(
       path,
       version: 3,
-      onCreate: (Database db, int t) async {
-        /*await db.execute(
-            'CREATE TABLE LIST (listID INTEGER PRIMARY KEY, listName TEXT, isActive INTEGER)');*/
-        await db.execute(
-            'CREATE TABLE TASK (taskID INTEGER PRIMARY KEY, taskListID INTEGER, parentTaskID INTEGER, taskName TEXT, deadlineDate INTEGER, deadlineTime INTEGER, isFinished INTEGER, isRepeating INTEGER, )');
-
-        //await db.insert("LIST", {"listName": "Default", "isActive": 1});
-      },
+      onConfigure: _onConfigure,
+      onCreate: _onCreate,
     );
     _db = taskDb;
     return taskDb;
