@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 enum RepeatCycle {
   onceADay,
   onceADayMonFri,
@@ -6,6 +8,19 @@ enum RepeatCycle {
   onceAYear,
   other,
 }
+
+String repeatCycleToUIString(RepeatCycle r) {
+  Map<RepeatCycle, String> mapper = {
+    RepeatCycle.onceADay: "Once A Day",
+    RepeatCycle.onceADayMonFri: "Once A Day( Mon-Fri )",
+    RepeatCycle.onceAWeek: "Once A Week",
+    RepeatCycle.onceAMonth: "Once A Month",
+    RepeatCycle.onceAYear: "Once A Year",
+    RepeatCycle.other: "Other...",
+  };
+  return (mapper[r]!);
+}
+
 enum Tenure { days, weeks, months, years }
 
 class RepeatFrequency {
@@ -15,34 +30,22 @@ class RepeatFrequency {
 }
 
 class Task {
-  static late int counter;
   Task({
     required this.taskName,
     required this.finished,
     required this.taskListID,
-    taskId = null,
+    required this.taskId,
     this.parentTaskID,
     this.deadlineDate,
     this.deadlineTime,
-  }) {
-    if (taskId == null) {
-      this.taskId = counter;
-      counter++;
-    } else {
-      this.taskId = taskId;
-    }
-  }
-
-  static initializeCounter(int counter) {
-    Task.counter = counter;
-  }
+  });
 
   late int taskId;
   int taskListID;
   int? parentTaskID; //used for repeated task instances only
   String taskName;
   DateTime? deadlineDate;
-  DateTime? deadlineTime;
+  TimeOfDay? deadlineTime;
   bool finished;
   void finishTask() {
     finished = true;
@@ -103,10 +106,10 @@ class TaskList {
 
   void FinishTask(Task task) {}
 
-  void addTask({
+  /*void addTask({
     required String taskName,
     DateTime? deadlineDate,
-    DateTime? deadlineTime,
+    TimeOfDay? deadlineTime,
     int? parentTaskID,
   }) {
     //
@@ -122,7 +125,7 @@ class TaskList {
     if (parentTaskID != null) {
       //
     }
-  }
+  }*/
 
   void finishTask(Task task) {}
 }

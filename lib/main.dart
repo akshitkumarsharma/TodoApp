@@ -68,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: () {
           Navigator.pushNamed(context, newTaskScreenID);
         },
-        child: Icon(
+        child: const Icon(
           Icons.add,
           size: 35,
         ),
